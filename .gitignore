@@ -8,6 +8,10 @@
 *.so
 *.dylib
 
+#node modules
+frontend/node_modules
+backend/node_modules
+
 # Test binary, built with `go test -c`
 *.test
 
