@@ -22,6 +22,7 @@ import AboutScreen from '../screens/AboutScreen';
 import { useAuth } from '../contexts/AuthContext';
 import { theme } from '../theme';
 import { RootStackParamList, TabParamList } from './types';
+import { Platform } from 'react-native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -54,9 +55,9 @@ function TabNavigator() {
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           borderTopColor: '#e0e0e0',
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+          paddingTop: Platform.OS === 'ios' ? 4 : 5,
+          height: Platform.OS === 'ios' ? 80 : 60,
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -125,6 +126,9 @@ export default function AppNavigator() {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="ForgotPassword" component={require('../screens/ForgotPasswordScreen').default} />
+          <Stack.Screen name="ForgotPasswordCode" component={require('../screens/ForgotPasswordCodeScreen').default} />
+          <Stack.Screen name="ForgotPasswordReset" component={require('../screens/ForgotPasswordResetScreen').default} />
         </>
       )}
     </Stack.Navigator>

@@ -29,3 +29,12 @@ type UserStats struct {
 	CurrentStreak  int `json:"current_streak"`
 	LongestStreak  int `json:"longest_streak"`
 }
+
+type PasswordResetCode struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Email     string             `bson:"email" json:"email"`
+	Code      string             `bson:"code" json:"code"`
+	ExpiresAt time.Time          `bson:"expires_at" json:"expires_at"`
+	Used      bool               `bson:"used" json:"used"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+}

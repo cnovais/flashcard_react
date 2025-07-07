@@ -170,21 +170,15 @@ export default function CreateDeckScreen() {
               <Text style={styles.sectionTitle}>Tags</Text>
               <View style={styles.tagInputContainer}>
                 <TextInput
-                  label="Adicionar tag"
+                  label="Nova tag"
                   value={newTag}
                   onChangeText={text => setNewTag(text.toLowerCase())}
                   style={styles.tagInput}
                   mode="outlined"
                   onSubmitEditing={addTag}
-                  returnKeyType="done"
                 />
-                <Button
-                  mode="contained"
-                  onPress={addTag}
-                  disabled={!newTag.trim()}
-                  style={styles.addTagButton}
-                >
-                  +
+                <Button mode="contained" onPress={addTag} style={styles.addTagButton}>
+                  Adicionar
                 </Button>
               </View>
 
@@ -194,7 +188,7 @@ export default function CreateDeckScreen() {
                     <Chip
                       key={index}
                       onClose={() => removeTag(tag)}
-                      style={styles.tag}
+                      style={styles.tagChip}
                       textStyle={styles.tagText}
                     >
                       {tag}
@@ -384,24 +378,23 @@ const styles = StyleSheet.create({
   tagInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   tagInput: {
     flex: 1,
     marginRight: 8,
   },
   addTagButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    marginLeft: 8,
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  tag: {
+  tagChip: {
     marginRight: 8,
     marginBottom: 8,
+    backgroundColor: '#e0e0e0',
   },
   tagText: {
     fontSize: 12,

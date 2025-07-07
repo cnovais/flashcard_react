@@ -11,8 +11,8 @@ services:
       - PORT=9090
       - MONGODB_URI=mongodb+srv://flashcard:MSOc13Sjc8c0vshn@cluster.j9kfm6e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster/flashcard_db
       - JWT_SECRET=your-secret-key-here
-      - GOOGLE_CLIENT_ID=your-google-client-id
-      - GOOGLE_CLIENT_SECRET=your-google-client-secret
+      - GOOGLE_CLIENT_ID=340373783361-4sfvoqtrc54l83e91h9imveqsa29dd55.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
       - LINKEDIN_CLIENT_ID=your-linkedin-client-id
       - LINKEDIN_CLIENT_SECRET=your-linkedin-client-secret
       - STRIPE_SECRET_KEY=your-stripe-secret-key
@@ -20,6 +20,11 @@ services:
       - AWS_SECRET_ACCESS_KEY=your-aws-secret-key
       - AWS_REGION=us-east-1
       - AWS_S3_BUCKET=your-s3-bucket
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=guardstudyofficial@gmail.com
+      - SMTP_PASS=qnyg xrmw uvma tkiz
+      - SMTP_FROM=guardstudyofficial@gmail.com
     depends_on:
       - mongo
     volumes:

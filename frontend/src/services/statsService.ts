@@ -141,7 +141,7 @@ export class StatsService {
   static async getStudyStats(userId: string): Promise<StudyStats> {
     try {
       const response = await api.get(`/api/stats/study?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get study stats:', error);
       throw error;
@@ -151,7 +151,7 @@ export class StatsService {
   static async getDeckStats(userId: string): Promise<DeckStats[]> {
     try {
       const response = await api.get(`/api/stats/decks?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get deck stats:', error);
       throw error;
@@ -161,7 +161,7 @@ export class StatsService {
   static async getProgressStats(userId: string): Promise<ProgressStats> {
     try {
       const response = await api.get(`/api/stats/progress?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get progress stats:', error);
       throw error;
@@ -176,7 +176,7 @@ export class StatsService {
       }
       
       const response = await api.get(`/api/stats/history?${params}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get study history:', error);
       throw error;
@@ -186,7 +186,7 @@ export class StatsService {
   static async exportData(userId: string): Promise<ExportData> {
     try {
       const response = await api.get(`/api/stats/export?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to export data:', error);
       throw error;
@@ -202,7 +202,7 @@ export class StatsService {
   }[]> {
     try {
       const response = await api.get(`/api/stats/weekly?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get weekly progress:', error);
       throw error;
@@ -219,7 +219,7 @@ export class StatsService {
   }[]> {
     try {
       const response = await api.get(`/api/stats/monthly?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get monthly progress:', error);
       throw error;
@@ -229,7 +229,7 @@ export class StatsService {
   static async getTagPerformance(userId: string): Promise<TagPerformance[]> {
     try {
       const response = await api.get(`/api/stats/tags?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get tag performance:', error);
       throw error;
@@ -243,7 +243,7 @@ export class StatsService {
   }> {
     try {
       const response = await api.get(`/api/stats/difficulty?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get difficulty stats:', error);
       throw error;
@@ -264,7 +264,7 @@ export class StatsService {
   }> {
     try {
       const response = await api.get(`/api/stats/time?userId=${userId}`);
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get study time stats:', error);
       throw error;
@@ -332,27 +332,27 @@ export class StatsService {
 
   async getSummary(): Promise<StudyStatsSummary> {
     const response = await api.get('/api/stats/summary');
-    return response.json();
+    return response.data;
   }
 
   async getStatsByPeriod(period: 'day' | 'week' | 'month', days: number = 30): Promise<StudyStatsByPeriod[]> {
     const response = await api.get(`/api/stats/period?period=${period}&days=${days}`);
-    return response.json();
+    return response.data;
   }
 
   async getPerformanceByDifficulty(): Promise<PerformanceByDifficulty[]> {
     const response = await api.get('/api/stats/difficulty');
-    return response.json();
+    return response.data;
   }
 
   async getDeckPerformance(): Promise<DeckPerformance[]> {
     const response = await api.get('/api/stats/decks');
-    return response.json();
+    return response.data;
   }
 
   async getDetailedStats(): Promise<DetailedStats> {
     const response = await api.get('/api/stats/detailed');
-    return response.json();
+    return response.data;
   }
 
   // Método para formatar tempo de estudo em formato legível
@@ -398,7 +398,7 @@ export class StatsService {
   }> {
     try {
       const response = await api.get('/api/stats/time-distribution');
-      return response.json();
+      return response.data;
     } catch (error) {
       console.error('Failed to get time distribution:', error);
       return {

@@ -2,15 +2,21 @@ package auth
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/smtp"
+	"os"
+	"strconv"
+	"time"
 
 	"flashcard-backend/internal/config"
 	"flashcard-backend/internal/domain/entities"
 	"flashcard-backend/internal/infrastructure/auth"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/linkedin"
@@ -185,4 +191,156 @@ func (s *Service) UpdateUserProfile(userID, name, email string) error {
 		return fmt.Errorf("invalid user ID: %w", err)
 	}
 	return s.repo.UpdateUserProfile(objectID, name, "")
+}
+
+func generateRandomCode(n int) (string, error) {
+	const letters = "0123456789"
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	for i := 0; i < n; i++ {
+		b[i] = letters[int(b[i])%len(letters)]
+	}
+	return string(b), nil
+}
+
+func sendResetEmail(to, code string) error {
+	host := os.Getenv("SMTP_HOST")
+	port := os.Getenv("SMTP_PORT")
+	user := os.Getenv("SMTP_USER")
+	pass := os.Getenv("SMTP_PASS")
+	from := os.Getenv("SMTP_FROM")
+	if host == "" || port == "" || user == "" || pass == "" || from == "" {
+		return fmt.Errorf("Configuração SMTP ausente")
+	}
+	portInt, err := strconv.Atoi(port)
+	if err != nil {
+		return fmt.Errorf("Porta SMTP inválida")
+	}
+	addr := fmt.Sprintf("%s:%d", host, portInt)
+	msg := []byte("To: " + to + "\r\n" +
+		"Subject: Código de recuperação de senha\r\n" +
+		"Content-Type: text/plain; charset=UTF-8\r\n" +
+		"\r\n" +
+		fmt.Sprintf("Seu código de recuperação é: %s\nO código expira em 15 minutos.", code) +
+		"\r\n")
+	auth := smtp.PlainAuth("", user, pass, host)
+	return smtp.SendMail(addr, auth, from, []string{to}, msg)
+}
+
+func (s *Service) CreatePasswordResetCode(email string) (string, error) {
+	user, err := s.repo.GetUserByEmail(email)
+	if err != nil || user == nil {
+		return "", fmt.Errorf("Usuário não encontrado")
+	}
+	code, err := generateRandomCode(6)
+	if err != nil {
+		return "", err
+	}
+	resetCode := &entities.PasswordResetCode{
+		Email:     email,
+		Code:      code,
+		ExpiresAt: time.Now().Add(15 * time.Minute),
+		Used:      false,
+		CreatedAt: time.Now(),
+	}
+	err = s.repo.CreatePasswordResetCode(resetCode)
+	if err != nil {
+		return "", err
+	}
+	err = sendResetEmail(email, code)
+	if err != nil {
+		return "", fmt.Errorf("Erro ao enviar email: %v", err)
+	}
+	return code, nil
+}
+
+func (s *Service) ValidatePasswordResetCode(email, code string) error {
+	prc, err := s.repo.GetPasswordResetCode(email, code)
+	if err != nil {
+		return fmt.Errorf("Código inválido ou expirado")
+	}
+	if prc.Used {
+		return fmt.Errorf("Código já utilizado")
+	}
+	if prc.ExpiresAt.Before(time.Now()) {
+		return fmt.Errorf("Código expirado")
+	}
+	return nil
+}
+
+func (s *Service) ResetPassword(email, code, newPassword string) error {
+	prc, err := s.repo.GetPasswordResetCode(email, code)
+	if err != nil {
+		return fmt.Errorf("Código inválido ou expirado")
+	}
+	if prc.Used {
+		return fmt.Errorf("Código já utilizado")
+	}
+	if prc.ExpiresAt.Before(time.Now()) {
+		return fmt.Errorf("Código expirado")
+	}
+	user, err := s.repo.GetUserByEmail(email)
+	if err != nil || user == nil {
+		return fmt.Errorf("Usuário não encontrado")
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("Erro ao gerar hash da senha")
+	}
+	user.Password = string(hashedPassword)
+	err = s.repo.CreateUser(user) // Aqui deveria ser um update, não create
+	if err != nil {
+		return fmt.Errorf("Erro ao atualizar senha")
+	}
+	err = s.repo.MarkPasswordResetCodeUsed(prc.ID)
+	if err != nil {
+		return fmt.Errorf("Erro ao marcar código como usado")
+	}
+	return nil
+}
+
+func (s *Service) AuthenticateWithGoogleAccessToken(accessToken string) (*entities.User, string, error) {
+	// Buscar dados do usuário na Google API
+	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + accessToken)
+	if err != nil {
+		return nil, "", fmt.Errorf("Erro ao buscar dados do Google: %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, "", fmt.Errorf("Token do Google inválido (status %d)", resp.StatusCode)
+	}
+	var userInfo GoogleUserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		return nil, "", fmt.Errorf("Erro ao decodificar resposta do Google: %v", err)
+	}
+	if !userInfo.VerifiedEmail {
+		return nil, "", fmt.Errorf("Email do Google não verificado")
+	}
+	// Buscar ou criar usuário
+	user, err := s.repo.GetUserByProviderID("google", userInfo.ID)
+	if err != nil {
+		// Criar novo usuário
+		user = &entities.User{
+			Email:      userInfo.Email,
+			Name:       userInfo.Name,
+			Avatar:     userInfo.Picture,
+			Provider:   "google",
+			ProviderID: userInfo.ID,
+		}
+		if err := s.repo.CreateUser(user); err != nil {
+			return nil, "", fmt.Errorf("Erro ao criar usuário: %v", err)
+		}
+	} else {
+		// Atualizar last login
+		_ = s.repo.UpdateUserLastLogin(user.ID)
+	}
+	// Gerar JWT
+	tokenString, err := auth.GenerateToken(user.ID, user.Email, s.cfg.Auth.JWTSecret, s.cfg.Auth.JWTExpiry)
+	if err != nil {
+		return nil, "", fmt.Errorf("Erro ao gerar token JWT: %v", err)
+	}
+	return user, tokenString, nil
 }

@@ -9,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import {
   TextInput,
@@ -23,6 +24,7 @@ import { theme } from '../theme';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { API_BASE_URL } from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -65,10 +67,22 @@ export function LoginScreen() {
       setLoading(true);
       console.log('Tentando login com:', { email: email.trim() });
       
+      // Teste de conectividade primeiro
+      try {
+        const healthResponse = await fetch(`${API_BASE_URL}/health`);
+        console.log('🔍 HEALTH CHECK STATUS:', healthResponse.status);
+        if (!healthResponse.ok) {
+          throw new Error('Backend não está respondendo');
+        }
+      } catch (healthError) {
+        console.error('🔍 ERRO HEALTH CHECK:', healthError);
+        Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique se o backend está rodando.');
+        return;
+      }
+      
       await signInWithEmail(email.trim(), password.trim());
       
       console.log('Login bem-sucedido!');
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
       
       // O AuthContext vai gerenciar a navegação automaticamente
       // Não precisamos navegar manualmente
@@ -83,21 +97,25 @@ export function LoginScreen() {
   };
 
   return (
-    <ImageBackground
-      source={{ uri: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80' }}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.overlay}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.container}
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardContainer}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.logoContainer}>
             <View style={styles.logoCircle}>
-              <Text style={styles.logoText}>📚</Text>
+              <ImageBackground
+                source={require('../../assets/icon.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
             </View>
-            <Title style={styles.appTitle}>FlashCard Pro</Title>
+            <Title style={styles.appTitle}>Guard Study</Title>
             <Paragraph style={styles.appSubtitle}>
               Aprenda de forma inteligente e divertida
             </Paragraph>
@@ -141,6 +159,9 @@ export function LoginScreen() {
               style={styles.input}
               keyboardType="email-address"
               autoCapitalize="none"
+              returnKeyType="next"
+              blurOnSubmit={false}
+              placeholder="seuemail@provedor.com"
             />
 
             <TextInput
@@ -150,6 +171,9 @@ export function LoginScreen() {
               mode="outlined"
               style={styles.input}
               secureTextEntry
+              returnKeyType="done"
+              onSubmitEditing={handleEmailLogin}
+              blurOnSubmit={true}
             />
 
             <Button
@@ -161,37 +185,38 @@ export function LoginScreen() {
               Entrar
             </Button>
 
-            <TouchableOpacity style={styles.forgotPassword}>
+            <TouchableOpacity style={styles.forgotPassword} onPress={() => navigation.navigate('ForgotPassword')}>
               <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
             </TouchableOpacity>
-          </Surface>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Não tem uma conta?{' '}
-              <Text style={styles.footerLink} onPress={() => navigation.navigate('Register')}>Cadastre-se</Text>
-            </Text>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </ImageBackground>
+            <View style={styles.registerContainer}>
+              <Text style={styles.registerText}>
+                Não tem uma conta?{' '}
+                <Text style={styles.registerLink} onPress={() => navigation.navigate('Register')}>
+                  Cadastre-se
+                </Text>
+              </Text>
+            </View>
+          </Surface>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: width,
-    height: height,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  },
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  keyboardContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
+    paddingVertical: 40,
   },
   logoContainer: {
     alignItems: 'center',
@@ -210,42 +235,44 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    overflow: 'hidden',
   },
-  logoText: {
-    fontSize: 40,
+  logoImage: {
+    width: 60,
+    height: 60,
   },
   appTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: theme.colors.primary,
     marginBottom: 8,
   },
   appSubtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: theme.colors.textSecondary,
     textAlign: 'center',
   },
   loginCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: theme.colors.surface,
     borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 16,
-    elevation: 12,
+    elevation: 8,
   },
   welcomeTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 8,
-    color: '#333',
+    color: theme.colors.text,
   },
   welcomeSubtitle: {
     textAlign: 'center',
     marginBottom: 24,
-    color: '#666',
+    color: theme.colors.textSecondary,
   },
   socialButtons: {
     marginBottom: 20,
@@ -307,16 +334,19 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontSize: 14,
   },
-  footer: {
+  registerContainer: {
     alignItems: 'center',
     marginTop: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
-  footerText: {
-    color: 'rgba(255, 255, 255, 0.8)',
+  registerText: {
+    color: theme.colors.textSecondary,
     fontSize: 14,
   },
-  footerLink: {
-    color: '#fff',
+  registerLink: {
+    color: theme.colors.primary,
     fontWeight: 'bold',
   },
 }); 

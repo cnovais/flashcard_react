@@ -40,16 +40,15 @@ export default function RegisterScreen() {
         email: email.trim(),
         password: password.trim(),
       });
-      console.log('Resposta do servidor:', response.data);
+      const data = await response.json();
+      console.log('Resposta do servidor:', data);
       
       // Salvar token e dados do usuário
-      await AsyncStorage.setItem('@FlashcardApp:token', response.data.token);
-      await AsyncStorage.setItem('@FlashcardApp:user', JSON.stringify(response.data.user));
+      await AsyncStorage.setItem('@FlashcardApp:token', data.token);
+      await AsyncStorage.setItem('@FlashcardApp:user', JSON.stringify(data.user));
       
       // Fazer login automático após o registro
       await signInWithEmail(email.trim(), password.trim());
-      
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
     } catch (error: any) {
       console.error('Erro completo:', error);
       console.error('Erro response:', error?.response);

@@ -117,3 +117,30 @@ func (r *Repository) UpdateUserProfile(userID primitive.ObjectID, name, email st
 	)
 	return err
 }
+
+// Password Reset Code methods
+func (r *Repository) CreatePasswordResetCode(code *entities.PasswordResetCode) error {
+	collection := r.db.GetCollection("password_reset_codes")
+	_, err := collection.InsertOne(context.Background(), code)
+	return err
+}
+
+func (r *Repository) GetPasswordResetCode(email, code string) (*entities.PasswordResetCode, error) {
+	collection := r.db.GetCollection("password_reset_codes")
+	var prc entities.PasswordResetCode
+	err := collection.FindOne(context.Background(), bson.M{"email": email, "code": code, "used": false}).Decode(&prc)
+	if err != nil {
+		return nil, err
+	}
+	return &prc, nil
+}
+
+func (r *Repository) MarkPasswordResetCodeUsed(id primitive.ObjectID) error {
+	collection := r.db.GetCollection("password_reset_codes")
+	_, err := collection.UpdateOne(
+		context.Background(),
+		bson.M{"_id": id},
+		bson.M{"$set": bson.M{"used": true}},
+	)
+	return err
+}

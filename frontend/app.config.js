@@ -1,11 +1,16 @@
 module.exports = {
   expo: {
-    name: "Flashcard App",
-    slug: "flashcard-app",
+    name: "Guard Study",
+    slug: "flash-card",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
+    extra: {
+      "eas": {
+        "projectId": "71d27c6f-ba57-472d-b79c-860444b92770"
+      }
+    },
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",

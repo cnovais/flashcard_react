@@ -140,17 +140,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signInWithEmail = async (email: string, password: string) => {
     console.log('🔧 LOGIN INICIADO');
+    console.log('🔧 EMAIL:', email);
+    console.log('🔧 PASSWORD LENGTH:', password.length);
+    
     try {
       setIsLoading(true);
       
+      console.log('🔧 FAZENDO REQUISIÇÃO PARA:', '/auth/login');
       const response = await api.post('/auth/login', {
         email,
         password,
       });
 
       console.log('🔧 STATUS LOGIN:', response.status);
+      console.log('🔧 RESPONSE OK:', response.ok);
 
-      if (response.status !== 200) {
+      if (!response.ok) {
         const errorData = await response.json();
         console.log('🔧 ERRO LOGIN:', errorData);
         throw new Error(errorData.error || 'Login failed');
@@ -158,6 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const result = await response.json();
       console.log('🔧 LOGIN SUCESSO:', !!result.token);
+      console.log('🔧 RESULT COMPLETO:', JSON.stringify(result, null, 2));
       
       if (result && result.user && result.token) {
         console.log('🔧 SALVANDO TOKEN...');
@@ -182,17 +188,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('🔧 TOKENS IGUAIS:', cleanToken === savedToken);
         
         setUser(result.user);
-        console.log('🔧 USUÁRIO DEFINIDO');
+        console.log('🔧 USUÁRIO DEFINIDO:', result.user);
+        console.log('🔧 LOGIN CONCLUÍDO COM SUCESSO!');
       } else {
+        console.log('🔧 RESPOSTA INVÁLIDA DO SERVIDOR');
+        console.log('🔧 RESULT:', result);
         throw new Error('Invalid response from server');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('🔧 ERRO LOGIN:', error);
+      console.error('🔧 ERRO MESSAGE:', error.message);
+      console.error('🔧 ERRO STACK:', error.stack);
+      
       await AsyncStorage.removeItem('@FlashcardApp:user');
       await AsyncStorage.removeItem('@FlashcardApp:token');
       throw error;
     } finally {
       setIsLoading(false);
+      console.log('🔧 LOGIN FINALIZADO - LOADING:', false);
     }
   };
 

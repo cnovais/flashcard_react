@@ -36,6 +36,10 @@ func SetupRoutes(
 		auth.GET("/linkedin", authModule.Handler.LinkedInAuth)
 		auth.POST("/register", authModule.Handler.Register)
 		auth.POST("/login", authModule.Handler.Login)
+		auth.POST("/forgot-password", authModule.Handler.ForgotPassword)
+		auth.POST("/validate-reset-code", authModule.Handler.ValidateResetCode)
+		auth.POST("/reset-password", authModule.Handler.ResetPassword)
+		auth.POST("/google", authModule.Handler.GoogleAuthExpo)
 	}
 
 	// Protected routes

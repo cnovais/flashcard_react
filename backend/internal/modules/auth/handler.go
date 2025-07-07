@@ -246,3 +246,74 @@ func (h *Handler) UpdateProfile(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully"})
 }
+
+func (h *Handler) ForgotPassword(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email inválido"})
+		return
+	}
+	_, err := h.service.CreatePasswordResetCode(req.Email)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Código enviado para o email (simulado)"})
+}
+
+func (h *Handler) ValidateResetCode(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required,email"`
+		Code  string `json:"code" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos"})
+		return
+	}
+	err := h.service.ValidatePasswordResetCode(req.Email, req.Code)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Código válido"})
+}
+
+func (h *Handler) ResetPassword(c *gin.Context) {
+	var req struct {
+		Email    string `json:"email" binding:"required,email"`
+		Code     string `json:"code" binding:"required"`
+		Password string `json:"password" binding:"required,min=6"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos"})
+		return
+	}
+	err := h.service.ResetPassword(req.Email, req.Code, req.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Senha redefinida com sucesso"})
+}
+
+func (h *Handler) GoogleAuthExpo(c *gin.Context) {
+	var req struct {
+		AccessToken string `json:"access_token" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "access_token obrigatório"})
+		return
+	}
+	user, token, err := h.service.AuthenticateWithGoogleAccessToken(req.AccessToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+	user.Password = ""
+	c.JSON(http.StatusOK, AuthResponse{
+		User:  user,
+		Token: token,
+	})
+}

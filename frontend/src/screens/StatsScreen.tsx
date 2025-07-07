@@ -538,7 +538,7 @@ export default function StatsScreen() {
               {decksToShow.slice(0, 4).map((deck, index) => (
                 <List.Item
                   key={deck.deck_id}
-                  title={deck.deck_name || `Deck ${deck.deck_id}`}
+                  title={deck.deck_name || 'Deck sem nome'}
                   description={`Cards revisados: ${deck.cards_reviewed} | Acurácia: ${deck.accuracy.toFixed(1)}%`}
                   left={props => <List.Icon {...props} icon="cards" />}
                 />

@@ -25,6 +25,9 @@ export type RootStackParamList = {
   Register: undefined;
   EditProfile: undefined;
   About: undefined;
+  ForgotPassword: undefined;
+  ForgotPasswordCode: { email: string };
+  ForgotPasswordReset: { email: string, code: string };
 };
 
 export type TabParamList = {

@@ -7,5 +7,5 @@ variable "key_name" {
 variable "public_key_path" {
   description = "Caminho para sua chave pública SSH"
   type        = string
-  default     = "~/.ssh/id_rsa.pub"
-} 
+  default     = "/Users/cleiton/.ssh/id_rsa.pub"
+}

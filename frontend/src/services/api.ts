@@ -1,6 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Para desenvolvimento, use o IP da sua máquina em vez de localhost
+// Substitua pelo IP da sua máquina na rede local
+//export const API_BASE_URL = 'http://192.168.0.8:3000'; // IP da sua máquina
 export const API_BASE_URL = 'http://localhost:3000';
+//export const API_BASE_URL = 'https://d21i09far2dzh0.cloudfront.net';
 
 // Callback para logout quando token for inválido
 let onTokenInvalid: (() => void) | null = null;
@@ -64,7 +68,9 @@ export const api = {
       throw error;
     }
     
-    return response;
+    // Aqui faz o parse automático do JSON
+    const data = await response.json();
+    return { data, status: response.status, ok: response.ok };
   },
 
   async get(endpoint: string) {

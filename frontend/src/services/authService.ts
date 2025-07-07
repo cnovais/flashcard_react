@@ -6,6 +6,11 @@ interface AuthResult {
   token: string;
 }
 
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
 export class AuthService {
   private static instance: AuthService;
 
@@ -16,15 +21,14 @@ export class AuthService {
     return AuthService.instance;
   }
 
-  async signInWithGoogle(): Promise<AuthResult> {
+  async signInWithEmail(email: string, password: string): Promise<AuthResult> {
     try {
-      // Mock authentication for now
-      const response = await api.get('/auth/google');
-      const result = response.data;
+      const response = await api.post('/auth/login', { email, password });
+      const result = await response.json();
       
       // Validate the response
       if (!result || !result.user || !result.token) {
-        throw new Error('Invalid response from Google authentication');
+        throw new Error('Invalid response from login');
       }
       
       // Store token and user data
@@ -32,6 +36,33 @@ export class AuthService {
       await AsyncStorage.setItem('@FlashcardApp:user', JSON.stringify(result.user));
       
       return result;
+    } catch (error) {
+      console.error('Email sign in error:', error);
+      // Clear any partial data
+      await AsyncStorage.removeItem('@FlashcardApp:token');
+      await AsyncStorage.removeItem('@FlashcardApp:user');
+      throw error;
+    }
+  }
+
+  async signInWithGoogle(): Promise<AuthResult> {
+    try {
+      // Primeiro, obter a URL de autorização do Google
+      const urlsResponse = await api.get('/auth/urls');
+      const urls = await urlsResponse.json();
+      
+      if (!urls.google) {
+        throw new Error('Google OAuth URL not available');
+      }
+
+      // Para React Native, você precisará usar uma biblioteca como @react-native-google-signin/google-signin
+      // Por enquanto, vamos simular o processo
+      console.log('Google OAuth URL:', urls.google);
+      
+      // TODO: Implementar integração real com Google Sign-In
+      // Por enquanto, vamos retornar um erro informativo
+      throw new Error('Google Sign-In not yet implemented. Please use email/password login for now.');
+      
     } catch (error) {
       console.error('Google sign in error:', error);
       // Clear any partial data
@@ -43,20 +74,20 @@ export class AuthService {
 
   async signInWithLinkedIn(): Promise<AuthResult> {
     try {
-      // Mock authentication for now
-      const response = await api.get('/auth/linkedin');
-      const result = response.data;
+      // Primeiro, obter a URL de autorização do LinkedIn
+      const urlsResponse = await api.get('/auth/urls');
+      const urls = await urlsResponse.json();
       
-      // Validate the response
-      if (!result || !result.user || !result.token) {
-        throw new Error('Invalid response from LinkedIn authentication');
+      if (!urls.linkedin) {
+        throw new Error('LinkedIn OAuth URL not available');
       }
+
+      // Para React Native, você precisará usar uma biblioteca específica para LinkedIn
+      console.log('LinkedIn OAuth URL:', urls.linkedin);
       
-      // Store token and user data
-      await AsyncStorage.setItem('@FlashcardApp:token', result.token);
-      await AsyncStorage.setItem('@FlashcardApp:user', JSON.stringify(result.user));
+      // TODO: Implementar integração real com LinkedIn Sign-In
+      throw new Error('LinkedIn Sign-In not yet implemented. Please use email/password login for now.');
       
-      return result;
     } catch (error) {
       console.error('LinkedIn sign in error:', error);
       // Clear any partial data
@@ -71,12 +102,38 @@ export class AuthService {
       // Clear local storage
       await AsyncStorage.removeItem('@FlashcardApp:token');
       await AsyncStorage.removeItem('@FlashcardApp:user');
-      
-      // Clear API headers
-      delete api.defaults.headers.authorization;
     } catch (error) {
       console.error('Sign out error:', error);
       throw error;
+    }
+  }
+
+  async getStoredUser(): Promise<any | null> {
+    try {
+      const userData = await AsyncStorage.getItem('@FlashcardApp:user');
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error('Error getting stored user:', error);
+      return null;
+    }
+  }
+
+  async getStoredToken(): Promise<string | null> {
+    try {
+      return await AsyncStorage.getItem('@FlashcardApp:token');
+    } catch (error) {
+      console.error('Error getting stored token:', error);
+      return null;
+    }
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    try {
+      const token = await this.getStoredToken();
+      return !!token;
+    } catch (error) {
+      console.error('Error checking authentication:', error);
+      return false;
     }
   }
 
