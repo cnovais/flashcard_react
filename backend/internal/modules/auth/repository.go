@@ -144,3 +144,16 @@ func (r *Repository) MarkPasswordResetCodeUsed(id primitive.ObjectID) error {
 	)
 	return err
 }
+
+func (r *Repository) UpdateUserPassword(email, hashedPassword string) error {
+	collection := r.db.GetCollection("users")
+	_, err := collection.UpdateOne(
+		context.Background(),
+		bson.M{"email": email},
+		bson.M{"$set": bson.M{
+			"password":   hashedPassword,
+			"updated_at": time.Now(),
+		}},
+	)
+	return err
+}

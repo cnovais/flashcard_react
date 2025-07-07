@@ -37,21 +37,10 @@ export default function CreateDeckScreen() {
   const [isPublic, setIsPublic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userDecks, setUserDecks] = useState<Deck[]>([]);
-  const [color, setColor] = useState('#6200ee');
-  const [border, setBorder] = useState('#000000');
-  const [background, setBackground] = useState('#ffffff');
-  const [showColors, setShowColors] = useState(false);
   const navigation = useNavigation<CreateDeckScreenNavigationProp>();
   const { addXP } = useGamification();
   const { user } = useAuth();
   const theme = useTheme();
-
-  const colorOptions = [
-    '#000000', // preto
-    '#ffffff', // branco
-    '#6200ee', '#03dac6', '#ff6b6b', '#4ecdc4', '#45b7d1',
-    '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'
-  ];
 
   useEffect(() => {
     loadUserDecks();
@@ -100,18 +89,12 @@ export default function CreateDeckScreen() {
         description: description.trim() || undefined,
         tags,
         isPublic,
-        color,
-        border,
-        background,
       });
       await DeckService.createDeck({
         name: name.trim(),
         description: description.trim() || undefined,
         tags,
         isPublic,
-        color,
-        border,
-        background,
       });
       addXP(25);
       await loadUserDecks();
@@ -194,63 +177,6 @@ export default function CreateDeckScreen() {
                       {tag}
                     </Chip>
                   ))}
-                </View>
-              )}
-            </View>
-
-            <View style={styles.personalizationSection}>
-              <Text style={styles.sectionTitle}>Personalização</Text>
-              <TouchableOpacity onPress={() => setShowColors(!showColors)} style={{marginBottom: 12, alignSelf: 'flex-start'}}>
-                <Text style={{color: theme.colors.primary, fontWeight: 'bold'}}>
-                  {showColors ? 'Ocultar opções de cor ▲' : 'Personalizar cores ▼'}
-                </Text>
-              </TouchableOpacity>
-              {showColors && (
-                <View>
-                  <Text style={styles.colorLabel}>Cor Principal:</Text>
-                  <View style={styles.colorOptions}>
-                    {colorOptions.map((colorOption) => (
-                      <TouchableOpacity
-                        key={colorOption}
-                        style={[
-                          styles.colorOption,
-                          { backgroundColor: colorOption },
-                          color === colorOption && styles.selectedColor
-                        ]}
-                        onPress={() => setColor(colorOption)}
-                      />
-                    ))}
-                  </View>
-
-                  <Text style={styles.colorLabel}>Cor da Borda:</Text>
-                  <View style={styles.colorOptions}>
-                    {colorOptions.map((colorOption) => (
-                      <TouchableOpacity
-                        key={colorOption}
-                        style={[
-                          styles.colorOption,
-                          { backgroundColor: colorOption },
-                          border === colorOption && styles.selectedColor
-                        ]}
-                        onPress={() => setBorder(colorOption)}
-                      />
-                    ))}
-                  </View>
-
-                  <Text style={styles.colorLabel}>Cor de Fundo:</Text>
-                  <View style={styles.colorOptions}>
-                    {colorOptions.map((colorOption) => (
-                      <TouchableOpacity
-                        key={colorOption}
-                        style={[
-                          styles.colorOption,
-                          { backgroundColor: colorOption },
-                          background === colorOption && styles.selectedColor
-                        ]}
-                        onPress={() => setBackground(colorOption)}
-                      />
-                    ))}
-                  </View>
                 </View>
               )}
             </View>

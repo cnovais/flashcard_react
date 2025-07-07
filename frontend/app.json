@@ -16,14 +16,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.flashcard.app"
+      "bundleIdentifier": "com.guardstudy.flashcard.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.flashcard.app"
+      "package": "com.guardstudy.flashcard.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",

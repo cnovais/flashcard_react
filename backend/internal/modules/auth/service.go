@@ -291,7 +291,7 @@ func (s *Service) ResetPassword(email, code, newPassword string) error {
 		return fmt.Errorf("Erro ao gerar hash da senha")
 	}
 	user.Password = string(hashedPassword)
-	err = s.repo.CreateUser(user) // Aqui deveria ser um update, não create
+	err = s.repo.UpdateUserPassword(user.Email, user.Password)
 	if err != nil {
 		return fmt.Errorf("Erro ao atualizar senha")
 	}
@@ -343,4 +343,45 @@ func (s *Service) AuthenticateWithGoogleAccessToken(accessToken string) (*entiti
 		return nil, "", fmt.Errorf("Erro ao gerar token JWT: %v", err)
 	}
 	return user, tokenString, nil
+}
+
+// Função para enviar e-mail de boas-vindas
+func sendWelcomeEmail(to, name string) error {
+	host := os.Getenv("SMTP_HOST")
+	port := os.Getenv("SMTP_PORT")
+	user := os.Getenv("SMTP_USER")
+	pass := os.Getenv("SMTP_PASS")
+	from := os.Getenv("SMTP_FROM")
+	if host == "" || port == "" || user == "" || pass == "" || from == "" {
+		return fmt.Errorf("Configuração SMTP ausente")
+	}
+	portInt, err := strconv.Atoi(port)
+	if err != nil {
+		return fmt.Errorf("Porta SMTP inválida")
+	}
+	addr := fmt.Sprintf("%s:%d", host, portInt)
+	msg := []byte("To: " + to + "\r\n" +
+		"Subject: Bem-vindo ao Flashcard!\r\n" +
+		"MIME-Version: 1.0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"\r\n" +
+		fmt.Sprintf(`
+		  <div style='font-family:sans-serif;max-width:600px;margin:auto;background:#fff;border-radius:12px;padding:32px 24px 24px 24px;box-shadow:0 2px 8px #0001;'>
+		    <h2 style='color:#FF6200;'>Bem-vindo, %s! 🎉</h2>
+		    <p style='font-size:18px;color:#222;'>Sua conta foi criada com sucesso no <b>Flashcard</b>!</p>
+		    <ul style='font-size:16px;color:#333;margin:18px 0 18px 18px;'>
+		      <li>Crie e organize seus próprios decks de estudo</li>
+		      <li>Adicione flashcards ilimitados</li>
+		      <li>Ganhe XP e conquistas estudando diariamente</li>
+		      <li>Acompanhe seu progresso com estatísticas detalhadas</li>
+		      <li>Compartilhe decks com amigos</li>
+		    </ul>
+		    <p style='font-size:16px;color:#444;'>Acesse o app e comece a turbinar seus estudos agora mesmo!<br/><br/>Equipe Flashcard 🚀</p>
+		    <hr style='margin:24px 0;border:none;border-top:1px solid #eee;'>
+		    <p style='font-size:13px;color:#888;text-align:center;'>Dúvidas? Responda este e-mail ou acesse o menu de ajuda no app.</p>
+		  </div>
+		`, name) +
+		"\r\n")
+	auth := smtp.PlainAuth("", user, pass, host)
+	return smtp.SendMail(addr, auth, from, []string{to}, msg)
 }

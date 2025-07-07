@@ -24,7 +24,7 @@ export class AuthService {
   async signInWithEmail(email: string, password: string): Promise<AuthResult> {
     try {
       const response = await api.post('/auth/login', { email, password });
-      const result = await response.json();
+      const result = response.data;
       
       // Validate the response
       if (!result || !result.user || !result.token) {
@@ -49,7 +49,7 @@ export class AuthService {
     try {
       // Primeiro, obter a URL de autorização do Google
       const urlsResponse = await api.get('/auth/urls');
-      const urls = await urlsResponse.json();
+      const urls = urlsResponse.data;
       
       if (!urls.google) {
         throw new Error('Google OAuth URL not available');
@@ -76,7 +76,7 @@ export class AuthService {
     try {
       // Primeiro, obter a URL de autorização do LinkedIn
       const urlsResponse = await api.get('/auth/urls');
-      const urls = await urlsResponse.json();
+      const urls = urlsResponse.data;
       
       if (!urls.linkedin) {
         throw new Error('LinkedIn OAuth URL not available');
@@ -142,6 +142,24 @@ export class AuthService {
       await api.put('/api/user/avatar', { avatar });
     } catch (error) {
       console.error('Update avatar error:', error);
+      throw error;
+    }
+  }
+
+  async register(name: string, email: string, password: string): Promise<AuthResult> {
+    try {
+      const response = await api.post('/auth/register', { name, email, password });
+      const result = response.data;
+      if (!result || !result.user || !result.token) {
+        throw new Error('Invalid response from register');
+      }
+      await AsyncStorage.setItem('@FlashcardApp:token', result.token);
+      await AsyncStorage.setItem('@FlashcardApp:user', JSON.stringify(result.user));
+      return result;
+    } catch (error) {
+      console.error('Register error:', error);
+      await AsyncStorage.removeItem('@FlashcardApp:token');
+      await AsyncStorage.removeItem('@FlashcardApp:user');
       throw error;
     }
   }

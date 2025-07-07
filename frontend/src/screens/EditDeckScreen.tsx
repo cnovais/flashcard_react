@@ -38,19 +38,8 @@ export default function EditDeckScreen() {
   const [description, setDescription] = useState(deck.description || '');
   const [tags, setTags] = useState<string[]>(deck.tags || []);
   const [newTag, setNewTag] = useState('');
-  const [color, setColor] = useState(deck.color || '#6200ee');
-  const [border, setBorder] = useState(deck.border || '#000000');
-  const [background, setBackground] = useState(deck.background || '#ffffff');
   const [isPublic, setIsPublic] = useState(deck.isPublic);
   const [loading, setLoading] = useState(false);
-  const [showColors, setShowColors] = useState(false);
-
-  const colorOptions = [
-    '#000000', // preto
-    '#ffffff', // branco
-    '#6200ee', '#03dac6', '#ff6b6b', '#4ecdc4', '#45b7d1',
-    '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'
-  ];
 
   const addTag = () => {
     const tag = newTag.trim().toLowerCase();
@@ -76,9 +65,6 @@ export default function EditDeckScreen() {
         name: name.trim(),
         description: description.trim(),
         tags,
-        color,
-        border,
-        background,
         isPublic,
       };
 
@@ -178,61 +164,6 @@ export default function EditDeckScreen() {
               ))}
             </View>
 
-            <Text style={styles.sectionTitle}>Personalização</Text>
-            <TouchableOpacity onPress={() => setShowColors(!showColors)} style={{marginBottom: 12, alignSelf: 'flex-start'}}>
-              <Text style={{color: theme.colors.primary, fontWeight: 'bold'}}>
-                {showColors ? 'Ocultar opções de cor ▲' : 'Personalizar cores ▼'}
-              </Text>
-            </TouchableOpacity>
-            {showColors && (
-              <View>
-                <Text style={styles.colorLabel}>Cor Principal:</Text>
-                <View style={styles.colorOptions}>
-                  {colorOptions.map((colorOption) => (
-                    <TouchableOpacity
-                      key={colorOption}
-                      style={[
-                        styles.colorOption,
-                        { backgroundColor: colorOption },
-                        color === colorOption && styles.selectedColor
-                      ]}
-                      onPress={() => setColor(colorOption)}
-                    />
-                  ))}
-                </View>
-
-                <Text style={styles.colorLabel}>Cor da Borda:</Text>
-                <View style={styles.colorOptions}>
-                  {colorOptions.map((colorOption) => (
-                    <TouchableOpacity
-                      key={colorOption}
-                      style={[
-                        styles.colorOption,
-                        { backgroundColor: colorOption },
-                        border === colorOption && styles.selectedColor
-                      ]}
-                      onPress={() => setBorder(colorOption)}
-                    />
-                  ))}
-                </View>
-
-                <Text style={styles.colorLabel}>Cor de Fundo:</Text>
-                <View style={styles.colorOptions}>
-                  {colorOptions.map((colorOption) => (
-                    <TouchableOpacity
-                      key={colorOption}
-                      style={[
-                        styles.colorOption,
-                        { backgroundColor: colorOption },
-                        background === colorOption && styles.selectedColor
-                      ]}
-                      onPress={() => setBackground(colorOption)}
-                    />
-                  ))}
-                </View>
-              </View>
-            )}
-
             <Text style={styles.sectionTitle}>Visibilidade</Text>
             <View style={styles.visibilityContainer}>
               <Text style={styles.visibilityText}>
@@ -312,31 +243,6 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-  },
-  colorLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 16,
-    marginBottom: 8,
-    color: '#333',
-  },
-  colorOptions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 16,
-  },
-  colorOption: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-    marginBottom: 8,
-    borderWidth: 2,
-    borderColor: '#ddd',
-  },
-  selectedColor: {
-    borderWidth: 3,
-    borderColor: '#333',
   },
   visibilityContainer: {
     flexDirection: 'row',

@@ -23,7 +23,7 @@ services:
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
       - SMTP_USER=guardstudyofficial@gmail.com
-      - SMTP_PASS=qnyg xrmw uvma tkiz
+      - SMTP_PASS=flxy xvzf qnab fzxi
       - SMTP_FROM=guardstudyofficial@gmail.com
     depends_on:
       - mongo

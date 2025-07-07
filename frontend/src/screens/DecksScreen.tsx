@@ -18,6 +18,7 @@ import { useGamification } from '../contexts/GamificationContext';
 import { RootStackParamList } from '../navigation/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { theme } from '../theme';
 
 type DecksScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main'>;
 
@@ -264,7 +265,7 @@ export default function DecksScreen() {
           selected={filter === 'all'}
           onPress={() => setFilter('all')}
           style={{
-            backgroundColor: filter === 'all' ? '#6200ee' : '#e0e0e0',
+            backgroundColor: filter === 'all' ? theme.colors.primary : '#e0e0e0',
             marginRight: 8,
             height: 32,
           }}
@@ -276,7 +277,7 @@ export default function DecksScreen() {
           selected={filter === 'public'}
           onPress={() => setFilter('public')}
           style={{
-            backgroundColor: filter === 'public' ? '#6200ee' : '#e0e0e0',
+            backgroundColor: filter === 'public' ? theme.colors.primary : '#e0e0e0',
             marginRight: 8,
             height: 32,
           }}
@@ -288,7 +289,7 @@ export default function DecksScreen() {
           selected={filter === 'private'}
           onPress={() => setFilter('private')}
           style={{
-            backgroundColor: filter === 'private' ? '#6200ee' : '#e0e0e0',
+            backgroundColor: filter === 'private' ? theme.colors.primary : '#e0e0e0',
             marginRight: 8,
             height: 32,
           }}
@@ -430,7 +431,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   createButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,

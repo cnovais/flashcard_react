@@ -21,7 +21,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-  const { signInWithEmail } = useAuth();
+  const { register } = useAuth();
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -34,21 +34,7 @@ export default function RegisterScreen() {
     }
     try {
       setLoading(true);
-      console.log('Tentando registrar usuário:', { name: name.trim(), email: email.trim() });
-      const response = await api.post('/auth/register', {
-        name: name.trim(),
-        email: email.trim(),
-        password: password.trim(),
-      });
-      const data = await response.json();
-      console.log('Resposta do servidor:', data);
-      
-      // Salvar token e dados do usuário
-      await AsyncStorage.setItem('@FlashcardApp:token', data.token);
-      await AsyncStorage.setItem('@FlashcardApp:user', JSON.stringify(data.user));
-      
-      // Fazer login automático após o registro
-      await signInWithEmail(email.trim(), password.trim());
+      await register(name.trim(), email.trim(), password.trim());
     } catch (error: any) {
       console.error('Erro completo:', error);
       console.error('Erro response:', error?.response);

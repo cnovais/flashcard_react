@@ -20,7 +20,7 @@ export default function AboutScreen() {
   const navigation = useNavigation<AboutScreenNavigationProp>();
 
   const handleEmailSupport = () => {
-    Linking.openURL('mailto:teste@gmail.com?subject=Suporte Flashcard App');
+    Linking.openURL('mailto:guardstudyofficial@gmail.com?subject=Suporte Guard Study App');
   };
 
   const handlePrivacyPolicy = () => {
@@ -57,7 +57,7 @@ export default function AboutScreen() {
               size={80} 
               color="#6200ee" 
             />
-            <Text style={styles.appName}>Flashcard App</Text>
+            <Text style={styles.appName}>Guard Study App</Text>
             <Text style={styles.appVersion}>Versão 1.0.0</Text>
             <Text style={styles.appDescription}>
               Aplicativo de flashcards para ajudar você a estudar de forma eficiente e divertida.
@@ -73,7 +73,7 @@ export default function AboutScreen() {
           
           <List.Item
             title="Contato por Email"
-            description="teste@gmail.com"
+            description="guardstudyofficial@gmail.com"
             left={(props) => <List.Icon {...props} icon="email" />}
             onPress={handleEmailSupport}
           />
@@ -156,7 +156,7 @@ export default function AboutScreen() {
           </Text>
           
           <Text style={styles.creditsText}>
-            © 2024 Flashcard App. Todos os direitos reservados.
+            © 2024 Guard Study App. Todos os direitos reservados.
           </Text>
         </Card.Content>
       </Card>
@@ -182,6 +182,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 8,
+    paddingTop: 16,
   },
   headerTitle: {
     fontSize: 18,
@@ -195,6 +196,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flex: 1,
+    paddingBottom: 100,
   },
   card: {
     margin: 16,

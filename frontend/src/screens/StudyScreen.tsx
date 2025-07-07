@@ -635,7 +635,7 @@ export default function StudyScreen() {
         {/* Contadores */}
         <View style={{ flexDirection: 'row', width: '90%', justifyContent: 'space-between', marginBottom: 16 }}>
           <View style={{ flex: 1, alignItems: 'center', borderWidth: 1, borderColor: gray, borderRadius: 12, marginRight: 8, padding: 12 }}>
-            <Text style={{ color: '#555', fontWeight: 'bold', fontSize: 16 }}>Novamente</Text>
+            <Text style={{ color: '#555', fontWeight: 'bold', fontSize: 16 }}>Nova.</Text>
             <Text style={{ color: red, fontWeight: 'bold', fontSize: 22 }}>{againCount}</Text>
           </View>
           <View style={{ flex: 1, alignItems: 'center', borderWidth: 1, borderColor: gray, borderRadius: 12, marginLeft: 8, padding: 12 }}>
@@ -767,8 +767,7 @@ export default function StudyScreen() {
                     key={deck.id}
                     style={[
                       styles.deckCard,
-                      deck.background ? { backgroundColor: deck.background } : {},
-                      deck.border ? { borderColor: deck.border, borderWidth: 2 } : {},
+                      deck.id === selectedDeck?.id && styles.selectedDeckCard,
                     ]}
                     onPress={() => setSelectedDeck(deck)}
                   >

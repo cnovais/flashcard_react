@@ -80,6 +80,9 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
+	// Enviar e-mail de boas-vindas (assíncrono)
+	go sendWelcomeEmail(user.Email, user.Name)
+
 	// Generate JWT token
 	token, err := auth.GenerateToken(user.ID, user.Email, h.cfg.Auth.JWTSecret, h.cfg.Auth.JWTExpiry)
 	if err != nil {

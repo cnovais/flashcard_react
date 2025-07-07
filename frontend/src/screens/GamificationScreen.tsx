@@ -110,42 +110,6 @@ export default function GamificationScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Card explicativo de XP */}
-      <Card style={styles.xpCard}>
-        <Card.Content style={styles.xpCardContent}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-            <MaterialCommunityIcons name="star-circle" size={32} color="#FFD600" style={{ marginRight: 8 }} />
-            <Title style={{ fontSize: 20, color: '#222' }}>Como ganhar XP?</Title>
-          </View>
-          <View style={styles.xpRow}><MaterialCommunityIcons name="plus-box" size={22} color="#42A5F5" style={{ marginRight: 8 }} /><Text style={styles.xpText}>Crie novos decks e cartões</Text></View>
-          <View style={styles.xpRow}><MaterialCommunityIcons name="book-open-variant" size={22} color="#7E57C2" style={{ marginRight: 8 }} /><Text style={styles.xpText}>Estude e revise flashcards</Text></View>
-          <View style={styles.xpRow}><MaterialCommunityIcons name="fire" size={22} color="#FF7043" style={{ marginRight: 8 }} /><Text style={styles.xpText}>Mantenha sua sequência de estudos (streak)</Text></View>
-          <View style={styles.xpRow}><MaterialCommunityIcons name="trophy" size={22} color="#FFD600" style={{ marginRight: 8 }} /><Text style={styles.xpText}>Desbloqueie conquistas</Text></View>
-        </Card.Content>
-      </Card>
-
-      {/* Mapa de conquistas visual */}
-      <View style={styles.mapContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.mapRow}>
-            {mapSteps.map((step, idx) => (
-              <React.Fragment key={step.key}>
-                <View style={styles.mapItem}>
-                  <MaterialCommunityIcons
-                    name={step.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                    size={44}
-                    color={unlockedCount > idx ? step.color : '#bbb'}
-                    style={unlockedCount > idx ? styles.mapIconUnlocked : styles.mapIconLocked}
-                  />
-                  <Text style={styles.mapLabel}>{step.label}</Text>
-                </View>
-                {idx < mapSteps.length - 1 && <View style={styles.mapLine} />}
-              </React.Fragment>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
-
       {/* Header com Mascote, Nome e XP */}
       <Surface style={styles.header}>
         <View style={styles.headerTop}>

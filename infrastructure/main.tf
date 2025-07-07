@@ -28,7 +28,7 @@ resource "aws_security_group" "backend_sg" {
 
 resource "aws_instance" "backend" {
   ami           = "ami-020cba7c55df1f615" # Ubuntu 22.04 LTS (us-east-1)
-  instance_type = "t3.micro"
+  instance_type = "t2.micro"
   key_name      = aws_key_pair.default.key_name
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
 
@@ -41,7 +41,7 @@ resource "aws_instance" "backend" {
     sudo apt-get update -y
     sudo apt-get install -y docker.io docker-compose git
     cd /home/ubuntu
-    git clone https://github.com/SEU_REPO/flashcard_react.git
+    git clone https://github.com/cnovais/flashcard_react.git
     cd flashcard_react/backend
     sudo docker-compose up -d
   EOF

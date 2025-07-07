@@ -23,6 +23,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   updateAvatar: (avatar: string) => Promise<void>;
   updateUser: (updated: Partial<User>) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -156,12 +157,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('🔧 RESPONSE OK:', response.ok);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.log('🔧 ERRO LOGIN:', errorData);
-        throw new Error(errorData.error || 'Login failed');
+        console.log('🔧 ERRO LOGIN:', response.data);
+        throw new Error(response.data.error || 'Login failed');
       }
 
-      const result = await response.json();
+      const result = response.data;
       console.log('🔧 LOGIN SUCESSO:', !!result.token);
       console.log('🔧 RESULT COMPLETO:', JSON.stringify(result, null, 2));
       
@@ -247,6 +247,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const register = async (name: string, email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      await authService.register(name, email, password);
+      // Não faz login automático após cadastro
+    } catch (error: any) {
+      console.error('Erro no cadastro:', error);
+      await AsyncStorage.removeItem('@FlashcardApp:user');
+      await AsyncStorage.removeItem('@FlashcardApp:token');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -256,6 +271,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     updateAvatar,
     updateUser,
+    register,
   };
 
   return (

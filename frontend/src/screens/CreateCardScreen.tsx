@@ -239,15 +239,17 @@ export default function CreateCardScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Resposta</Text>
-            <TextInput
-              style={styles.textArea}
-              value={answer}
-              onChangeText={setAnswer}
-              placeholder="Digite a resposta..."
-              multiline
-              numberOfLines={8}
-              textAlignVertical="top"
-            />
+            {cardType === 'open' && (
+              <TextInput
+                style={styles.textArea}
+                value={answer}
+                onChangeText={setAnswer}
+                placeholder="Digite a resposta..."
+                multiline
+                numberOfLines={8}
+                textAlignVertical="top"
+              />
+            )}
           </View>
 
           <View style={styles.inputGroup}>
